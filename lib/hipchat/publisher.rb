@@ -1,0 +1,1 @@
+require 'hipchat/publisher/api'

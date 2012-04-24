@@ -1,5 +1,5 @@
 require 'bundler/setup'
-require 'hipchat/api'
+require 'hipchat/publisher'
 
 require 'java'
 
@@ -24,7 +24,7 @@ class HipchatPublisher < Jenkins::Tasks::Publisher
 
   def perform(build, launcher, listener)
 
-    api = HipChat::API.new(token, room, SENDER)
+    api = HipChat::Publisher::API.new(token, room, SENDER)
 
     case build.native.result
     when Result::SUCCESS
