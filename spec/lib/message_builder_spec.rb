@@ -5,7 +5,7 @@ module HipChat
     describe SuccessMessageBuilder do
       describe '#build' do
         let(:build) { double('build') }
-        subject { SuccessMessageBuilder.new(build).build }
+        subject { SuccessMessageBuilder.new(build).build_message }
 
         its(:body) { should eq 'SUCCESS' }
         its(:options) { should eq :color => 'green', :notify => false }
@@ -15,7 +15,7 @@ module HipChat
     describe UnstableMessageBuilder do
       describe '#build' do
         let(:build) { double('build') }
-        subject { UnstableMessageBuilder.new(build).build }
+        subject { UnstableMessageBuilder.new(build).build_message }
 
         its(:body) { should eq 'UNSTABLE' }
         its(:options) { should eq :color => 'yellow', :notify => true }
@@ -25,7 +25,7 @@ module HipChat
     describe FailureMessageBuilder do
       describe '#build' do
         let(:build) { double('build') }
-        subject { FailureMessageBuilder.new(build).build }
+        subject { FailureMessageBuilder.new(build).build_message }
 
         its(:body) { should eq 'FAILURE' }
         its(:options) { should eq :color => 'red', :notify => true }
@@ -35,7 +35,7 @@ module HipChat
     describe NotBuiltMessageBuilder do
       describe '#build' do
         let(:build) { double('build') }
-        subject { NotBuiltMessageBuilder.new(build).build }
+        subject { NotBuiltMessageBuilder.new(build).build_message }
 
         its(:body) { should eq 'NOT BUILT' }
         its(:options) { should eq :color => 'red', :notify => true }
@@ -45,7 +45,7 @@ module HipChat
     describe AbortedMessageBuilder do
       describe '#build' do
         let(:build) { double('build') }
-        subject { AbortedMessageBuilder.new(build).build }
+        subject { AbortedMessageBuilder.new(build).build_message }
 
         its(:body) { should eq 'ABORTED' }
         its(:options) { should eq :color => 'yellow', :notify => false }

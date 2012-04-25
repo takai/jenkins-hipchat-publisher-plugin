@@ -5,7 +5,7 @@ module HipChat
       attr_reader :color
       attr_reader :notify
 
-      def build
+      def build_message
         Message.new(message, :color => color, :notify => notify)
       end
     end
