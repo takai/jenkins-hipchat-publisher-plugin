@@ -1,17 +1,16 @@
 require 'bundler/setup'
 require 'hipchat/publisher'
 
-
 class HipchatPublisher < Jenkins::Tasks::Publisher
 
-  display_name "HipChat publisher"
+  display_name "HipChat Publisher"
 
   attr_reader :token
   attr_reader :room
 
   def initialize(opts)
-    @token  = opts['token']
-    @room   = opts['room']
+    @token = opts['token']
+    @room  = opts['room']
   end
 
   def prebuild(build, listener)
