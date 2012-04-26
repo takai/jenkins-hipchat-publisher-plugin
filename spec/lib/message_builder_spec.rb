@@ -2,52 +2,71 @@ require 'spec_helper'
 
 module HipChat
   module Publisher
-    describe SuccessMessageBuilder do
-      describe '#build' do
-        let(:build) { double('build') }
-        subject { SuccessMessageBuilder.new(build).build_message }
+    shared_context "jenkins build result" do
+      let(:build) do
+        b = double('build')
+        b.stub(:full_display_name => 'project #1')
+        b.stub(:duration_string   => '1 ms')
+        b.stub(:url               => 'job/project/1/')
+        b
+      end
 
-        its(:body) { should eq 'SUCCESS' }
+      subject do
+        builder = builder_class.new(build)
+        builder.jenkins_url = 'http://example.com'
+        builder.build_message
+      end
+    end
+
+    MESSAGE_TEMPLATE = 'project #1 - %s after 1 ms'\
+                       ' (<a href="http://example.com/job/project/1/">Open</a>)'
+
+    describe SuccessMessageBuilder do
+      include_context "jenkins build result"
+      let(:builder_class) { SuccessMessageBuilder }
+
+      describe '#build' do
+        its(:body) { should eq MESSAGE_TEMPLATE % 'Success' }
         its(:options) { should eq :color => 'green', :notify => false }
       end
     end
 
     describe UnstableMessageBuilder do
-      describe '#build' do
-        let(:build) { double('build') }
-        subject { UnstableMessageBuilder.new(build).build_message }
+      include_context "jenkins build result"
+      let(:builder_class) { UnstableMessageBuilder }
 
-        its(:body) { should eq 'UNSTABLE' }
+      describe '#build' do
+        its(:body) { should eq MESSAGE_TEMPLATE % 'Unstable' }
         its(:options) { should eq :color => 'yellow', :notify => true }
       end
     end
 
     describe FailureMessageBuilder do
-      describe '#build' do
-        let(:build) { double('build') }
-        subject { FailureMessageBuilder.new(build).build_message }
+      include_context "jenkins build result"
+      let(:builder_class) { FailureMessageBuilder }
 
-        its(:body) { should eq 'FAILURE' }
+      describe '#build' do
+        its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' }
         its(:options) { should eq :color => 'red', :notify => true }
       end
     end
 
     describe NotBuiltMessageBuilder do
-      describe '#build' do
-        let(:build) { double('build') }
-        subject { NotBuiltMessageBuilder.new(build).build_message }
+      include_context "jenkins build result"
+      let(:builder_class) { NotBuiltMessageBuilder }
 
-        its(:body) { should eq 'NOT BUILT' }
-        its(:options) { should eq :color => 'red', :notify => true }
+      describe '#build' do
+        its(:body) { should eq MESSAGE_TEMPLATE % 'Not Built' }
+        its(:options) { should eq :color => 'yellow', :notify => true }
       end
     end
 
     describe AbortedMessageBuilder do
-      describe '#build' do
-        let(:build) { double('build') }
-        subject { AbortedMessageBuilder.new(build).build_message }
+      include_context "jenkins build result"
+      let(:builder_class) { AbortedMessageBuilder }
 
-        its(:body) { should eq 'ABORTED' }
+      describe '#build' do
+        its(:body) { should eq MESSAGE_TEMPLATE % 'ABORTED' }
         its(:options) { should eq :color => 'yellow', :notify => false }
       end
     end

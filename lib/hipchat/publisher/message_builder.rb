@@ -2,11 +2,26 @@ module HipChat
   module Publisher
 
     module MessageBuilder
+      attr_reader :build
       attr_reader :color
       attr_reader :notify
+      attr_reader :status
+
+      attr_accessor :jenkins_url
 
       def build_message
         Message.new(message, :color => color, :notify => notify)
+      end
+
+      private
+      def jenkins
+        Java.jenkins.model.Jenkins.getInstance()
+      end
+
+      def message
+        "#{build.full_display_name} - #{status}" \
+        " after #{build.duration_string}" \
+        " (<a href=\"#{jenkins_url}/#{build.url}\">Open</a>)"
       end
     end
 
@@ -14,12 +29,10 @@ module HipChat
       include MessageBuilder
 
       def initialize(build)
+        @build  = build
+        @status = 'Success'
         @color  = 'green'
         @notify = false
-      end
-
-      def message
-        'SUCCESS'
       end
     end
 
@@ -27,12 +40,10 @@ module HipChat
       include MessageBuilder
 
       def initialize(build)
+        @build  = build
+        @status = 'Unstable'
         @color  = 'yellow'
         @notify = true
-      end
-
-      def message
-        'UNSTABLE'
       end
     end
 
@@ -40,12 +51,10 @@ module HipChat
       include MessageBuilder
 
       def initialize(build)
+        @build  = build
+        @status = '<b>FAILURE</b>'
         @color  = 'red'
         @notify = true
-      end
-
-      def message
-        'FAILURE'
       end
     end
 
@@ -53,12 +62,10 @@ module HipChat
       include MessageBuilder
 
       def initialize(build)
-        @color  = 'red'
+        @build  = build
+        @status = 'Not Built'
+        @color  = 'yellow'
         @notify = true
-      end
-
-      def message
-        'NOT BUILT'
       end
     end
 
@@ -66,12 +73,10 @@ module HipChat
       include MessageBuilder
 
       def initialize(build)
+        @build  = build
+        @status = 'ABORTED'
         @color  = 'yellow'
         @notify = false
-      end
-
-      def message
-        'ABORTED'
       end
     end
 
