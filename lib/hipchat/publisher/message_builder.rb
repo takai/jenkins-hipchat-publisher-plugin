@@ -14,7 +14,8 @@ module HipChat
       private
       def message
         msg = "#{build.full_display_name} - #{status} after #{build.duration_string}"
-        if instance = Java::jenkins::model::Jenkins.instance
+        instance = Java::jenkins::model::Jenkins.instance
+        if instance && instance.root_url
           msg << " (<a href=\"#{instance.root_url.chomp('/')}/#{build.url}\">Open</a>)"
         end
         msg

@@ -27,8 +27,15 @@ module HipChat
       let(:builder_class) { SuccessMessageBuilder }
 
       describe '#build' do
-        its(:body) { should eq MESSAGE_TEMPLATE % 'Success' }
-        its(:options) { should eq :color => 'green', :notify => false }
+        context 'Jenkins URL is set' do
+          its(:body) { should eq MESSAGE_TEMPLATE % 'Success' }
+          its(:options) { should eq :color => 'green', :notify => false }
+        end
+        context 'Jenkins URL is not set' do
+          before { Java::jenkins::model::Jenkins.stub_chain(:instance, :root_url => nil) }
+          its(:body) { should eq 'project #1 - Success after 1 ms' }
+          its(:options) { should eq :color => 'green', :notify => false }
+        end
       end
     end
 
