@@ -18,7 +18,6 @@ class HipchatPublisher < Jenkins::Tasks::Publisher
 
   def perform(build, launcher, listener)
     builder = HipChat::Publisher::MessageBuilderFactory.create(build.native)
-    builder.jenkins_url = Java::jenkins::model::Jenkins.instance.root_url
 
     message = builder.build_message
 

@@ -10,12 +10,11 @@ module HipChat
         b.stub(:url               => 'job/project/1/')
         b
       end
+      before {
+        Java::jenkins::model::Jenkins.stub_chain(:instance, :root_url => 'http://example.com/')
+      }
 
-      subject do
-        builder = builder_class.new(build)
-        builder.jenkins_url = 'http://example.com'
-        builder.build_message
-      end
+      subject { builder_class.new(build).build_message }
     end
 
     MESSAGE_TEMPLATE = 'project #1 - %s after 1 ms'\

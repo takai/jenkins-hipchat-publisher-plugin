@@ -7,21 +7,17 @@ module HipChat
       attr_reader :notify
       attr_reader :status
 
-      attr_accessor :jenkins_url
-
       def build_message
         Message.new(message, :color => color, :notify => notify)
       end
 
       private
-      def jenkins
-        Java.jenkins.model.Jenkins.getInstance()
-      end
-
       def message
-        "#{build.full_display_name} - #{status}" \
-        " after #{build.duration_string}" \
-        " (<a href=\"#{jenkins_url}/#{build.url}\">Open</a>)"
+        msg = "#{build.full_display_name} - #{status} after #{build.duration_string}"
+        if instance = Java::jenkins::model::Jenkins.instance
+          msg << " (<a href=\"#{instance.root_url.chomp('/')}/#{build.url}\">Open</a>)"
+        end
+        msg
       end
     end
 
