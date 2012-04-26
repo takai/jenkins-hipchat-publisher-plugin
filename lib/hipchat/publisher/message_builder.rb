@@ -52,6 +52,16 @@ module HipChat
         @color  = 'red'
         @notify = true
       end
+
+      def message
+        msg = super
+        items = build.change_set.items
+        unless items.empty?
+          msg << '<br>&emsp;changed by '
+          msg << items.map { |i| "@#{i.author.full_name}" }.join(' ')
+        end
+        msg
+      end
     end
 
     class NotBuiltMessageBuilder

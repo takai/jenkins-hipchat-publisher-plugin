@@ -18,7 +18,6 @@ class HipchatPublisher < Jenkins::Tasks::Publisher
 
   def perform(build, launcher, listener)
     builder = HipChat::Publisher::MessageBuilderFactory.create(build.native)
-
     message = builder.build_message
 
     api = HipChat::Publisher::API.new(token, room, 'Jenkins')

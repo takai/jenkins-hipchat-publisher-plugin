@@ -3,12 +3,14 @@ require 'spec_helper'
 module HipChat
   module Publisher
     shared_context "jenkins build result" do
+      let(:item) { double('item').tap { |i| i.stub_chain(:author, :full_name => 'author') } }
       let(:build) do
-        b = double('build')
-        b.stub(:full_display_name => 'project #1')
-        b.stub(:duration_string   => '1 ms')
-        b.stub(:url               => 'job/project/1/')
-        b
+        double('build').tap do |b|
+          b.stub(:full_display_name => 'project #1')
+          b.stub(:duration_string   => '1 ms')
+          b.stub(:url               => 'job/project/1/')
+          b.stub_chain(:change_set, :items => [item])
+        end
       end
       before {
         Java::jenkins::model::Jenkins.stub_chain(:instance, :root_url => 'http://example.com/')
@@ -45,7 +47,7 @@ module HipChat
       let(:builder_class) { FailureMessageBuilder }
 
       describe '#build' do
-        its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' }
+        its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' + '<br>&emsp;changed by @author' }
         its(:options) { should eq :color => 'red', :notify => true }
       end
     end
