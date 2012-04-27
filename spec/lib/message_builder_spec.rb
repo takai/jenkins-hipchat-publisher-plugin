@@ -9,7 +9,7 @@ module HipChat
           b.stub(:full_display_name => 'project #1')
           b.stub(:duration_string   => '1 ms')
           b.stub(:url               => 'job/project/1/')
-          b.stub_chain(:change_set, :items => [item])
+          b.stub_chain(:change_set, :items => [item, item])
         end
       end
       before {

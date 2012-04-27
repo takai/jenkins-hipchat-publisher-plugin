@@ -59,7 +59,7 @@ module HipChat
         items = build.change_set.items
         unless items.empty?
           msg << '<br>&emsp;changed by '
-          msg << items.map { |i| "@#{i.author.full_name}" }.join(' ')
+          msg << items.map { |i| "@#{i.author.full_name}" }.uniq.join(' ')
         end
         msg
       end
