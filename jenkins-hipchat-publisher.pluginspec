@@ -3,7 +3,7 @@
 Jenkins::Plugin::Specification.new do |plugin|
   plugin.name = "jenkins-hipchat-publisher"
   plugin.display_name = "Jenkins Hipchat Publisher Plugin"
-  plugin.version = '0.0.1'
+  plugin.version = '0.0.2'
   plugin.description = 'This plugin enables Jenkins to send build notifications to HipChat.'
 
   # plugin.url = 'https://wiki.jenkins-ci.org/display/JENKINS/Jenkins+Hipchat+Publisher+Plugin'
