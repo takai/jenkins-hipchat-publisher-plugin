@@ -3,13 +3,13 @@ require 'spec_helper'
 module HipChat
   module Publisher
     shared_context "jenkins build result" do
-      let(:item) { double('item').tap { |i| i.stub_chain(:author, :full_name => 'author') } }
       let(:build) do
         double('build').tap do |b|
           b.stub(:full_display_name => 'project #1')
           b.stub(:duration_string   => '1 ms')
           b.stub(:url               => 'job/project/1/')
-          b.stub_chain(:change_set, :items => [item, item])
+
+          b.stub_chain(:change_set, :items => [])
         end
       end
       before {
@@ -54,7 +54,20 @@ module HipChat
       let(:builder_class) { FailureMessageBuilder }
 
       describe '#build' do
-        its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' + '<br>&emsp;changed by @author' }
+        context 'default changeset' do
+          let(:item) { double('item').tap { |i| i.stub_chain(:author, :full_name => 'author') } }
+          before { build.stub_chain(:change_set, :items => [item, item]) }
+
+          its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' + '<br>&emsp;changed by @author' }
+        end
+
+        context 'git changeset' do
+          let(:item) { double('item').tap { |i| i.stub(:author_name => 'Author Name') } }
+          before { build.stub_chain(:change_set, :items => [item, item]) }
+
+          its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' + '<br>&emsp;changed by @"Author Name"' }
+        end
+
         its(:options) { should eq :color => 'red', :notify => true }
       end
     end
