@@ -23,7 +23,7 @@ module HipChat
         post.add_parameter 'message', message
 
         post.add_parameter 'color',   params[:color]       if params[:color]
-        post.add_parameter 'notify',  params[:notify].to_s if params[:notify]
+        post.add_parameter 'notify',  params[:notify] ? '1' : '0'
 
         post.params.content_charset = 'UTF-8'
 
