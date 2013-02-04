@@ -1,14 +1,15 @@
+require 'hipchat/publisher/git_workaround'
+
 module HipChat
   module Publisher
-
     module MessageBuilder
       attr_reader :build
       attr_reader :color
       attr_reader :notify
       attr_reader :status
 
-      def build_message
-        Message.new(message, :color => color, :notify => notify)
+      def build_messages
+        [Message.new(message, :color => color, :notify => notify)]
       end
 
       private
@@ -54,20 +55,28 @@ module HipChat
         @notify = true
       end
 
-      def message
-        msg = super
-        items = build.change_set.items
-        unless items.empty?
-          msg << '<br>&emsp;changed by '
-          msg << items.map { |i|
-            if i.respond_to? :author_name # GitChangeSet
-              "@\"#{i.author_name}\""
-            else
-              "@#{i.author.full_name}"
-            end
-          }.uniq.join(' ')
+      def build_messages
+        change_set_mes = change_set_message
+        if change_set_mes
+          super + [Message.new(change_set_mes, :color => color, :notify => notify, :message_format => 'text')]
+        else
+          super
         end
-        msg
+      end
+
+      private
+
+      def change_set_message
+        items = build.change_set.items
+        return nil if items.empty?
+        names = items.map { |i|
+          if i.respond_to? :author_name # GitChangeSet
+            "\"#{i.author_name}\""
+          else
+            "\"#{i.author.full_name}\""
+          end
+        }.uniq
+        "Changed by #{names.join(' ')}"
       end
     end
 

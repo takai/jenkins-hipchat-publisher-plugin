@@ -16,7 +16,8 @@ module HipChat
         Java::jenkins::model::Jenkins.stub_chain(:instance, :root_url => 'http://example.com/')
       }
 
-      subject { builder_class.new(build).build_message }
+      let(:messages) { builder_class.new(build).build_messages }
+      subject { messages[0] }
     end
 
     MESSAGE_TEMPLATE = 'project #1 - %s after 1 ms'\
@@ -58,14 +59,30 @@ module HipChat
           let(:item) { double('item').tap { |i| i.stub_chain(:author, :full_name => 'author') } }
           before { build.stub_chain(:change_set, :items => [item, item]) }
 
-          its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' + '<br>&emsp;changed by @author' }
+          its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' }
+
+          it "includes name on second message" do
+            messages[1].body.should == "Changed by \"author\""
+          end
+
+          it "renders second message as plain text" do
+            messages[1].options[:message_format] = 'text'
+          end
         end
 
         context 'git changeset' do
-          let(:item) { double('item').tap { |i| i.stub(:author_name => 'Author Name') } }
+          let(:item) { double('item').tap { |i| i.stub(:author_name => 'Author Name', :author_email => 'author@example.com') } }
           before { build.stub_chain(:change_set, :items => [item, item]) }
 
-          its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' + '<br>&emsp;changed by @"Author Name"' }
+          its(:body) { should eq MESSAGE_TEMPLATE % '<b>FAILURE</b>' }
+
+          it "includes author name on second message" do
+            messages[1].body.should == "Changed by \"Author Name\""
+          end
+
+          it "renders second message as plain text" do
+            messages[1].options[:message_format] = 'text'
+          end
         end
 
         its(:options) { should eq :color => 'red', :notify => true }

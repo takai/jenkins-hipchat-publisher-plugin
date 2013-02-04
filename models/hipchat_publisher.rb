@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'hipchat/publisher'
+require 'ruby-debug'
 
 class HipchatPublisher < Jenkins::Tasks::Publisher
 
@@ -17,11 +18,13 @@ class HipchatPublisher < Jenkins::Tasks::Publisher
   end
 
   def perform(build, launcher, listener)
-    builder = HipChat::Publisher::MessageBuilderFactory.create(build.native)
-    message = builder.build_message
+    builder  = HipChat::Publisher::MessageBuilderFactory.create(build.native)
+    messages = builder.build_messages
 
     api = HipChat::Publisher::API.new(token, room, 'Jenkins')
-    api.rooms_message(message.body, message.options)
+    messages.each do |message|
+      api.rooms_message(message.body, message.options)
+    end
   rescue
     listener.error "[HipChat Publisher] " + $!.message
   end
