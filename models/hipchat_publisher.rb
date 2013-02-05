@@ -1,6 +1,5 @@
 require 'bundler/setup'
 require 'hipchat/publisher'
-require 'ruby-debug'
 
 class HipchatPublisher < Jenkins::Tasks::Publisher
 
