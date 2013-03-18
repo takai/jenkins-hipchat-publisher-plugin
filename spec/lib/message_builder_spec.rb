@@ -16,7 +16,9 @@ module HipChat
         Java::jenkins::model::Jenkins.stub_chain(:instance, :root_url => 'http://example.com/')
       }
 
-      let(:messages) { builder_class.new(build).build_messages }
+      let(:exclude_successes) { false }
+      let(:messages) { builder_class.new(build).build_messages(:exclude_successes => exclude_successes) }
+
       subject { messages[0] }
     end
 
@@ -32,10 +34,25 @@ module HipChat
           its(:body) { should eq MESSAGE_TEMPLATE % 'Success' }
           its(:options) { should eq :color => 'green', :notify => false }
         end
+
         context 'Jenkins URL is not set' do
           before { Java::jenkins::model::Jenkins.stub_chain(:instance, :root_url => nil) }
           its(:body) { should eq 'project #1 - Success after 1 ms' }
           its(:options) { should eq :color => 'green', :notify => false }
+        end
+
+        context "when exclude_succeeds is false" do
+          let(:exclude_successes) { false }
+          subject { messages }
+
+          it { should_not be_empty }
+        end
+
+        context "when exclude_succeeds is true" do
+          let(:exclude_successes) { true }
+          subject { messages }
+
+          it { should be_empty }
         end
       end
     end

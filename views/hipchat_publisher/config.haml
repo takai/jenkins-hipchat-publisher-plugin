@@ -3,3 +3,6 @@
   - f.textbox
 - f.entry(:title => 'API Token', :field => 'token') do
   - f.textbox
+- f.entry(:title => "Don't notify for success builds", :field => 'exclude_successes') do
+  - checked = self.instance.get(:exclude_successes) rescue false
+  - f.checkbox(:checked => checked)

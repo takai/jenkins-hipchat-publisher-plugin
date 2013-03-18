@@ -8,7 +8,7 @@ module HipChat
       attr_reader :notify
       attr_reader :status
 
-      def build_messages
+      def build_messages(options={})
         [Message.new(message, :color => color, :notify => notify)]
       end
 
@@ -31,6 +31,14 @@ module HipChat
         @status = 'Success'
         @color  = 'green'
         @notify = false
+      end
+
+      def build_messages(options={})
+        if options[:exclude_successes]
+          []
+        else
+          super
+        end
       end
     end
 
@@ -55,7 +63,7 @@ module HipChat
         @notify = true
       end
 
-      def build_messages
+      def build_messages(options={})
         change_set_mes = change_set_message
         if change_set_mes
           super + [Message.new(change_set_mes, :color => color, :notify => notify, :message_format => 'text')]

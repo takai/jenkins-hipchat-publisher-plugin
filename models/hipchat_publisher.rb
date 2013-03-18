@@ -11,6 +11,8 @@ class HipchatPublisher < Jenkins::Tasks::Publisher
   def initialize(opts)
     @token = opts['token']
     @room  = opts['room']
+    @exclude_successes = opts['exclude_successes']
+    @exclude_successes = false if @exclude_successes.nil?
   end
 
   def prebuild(build, listener)
@@ -18,7 +20,7 @@ class HipchatPublisher < Jenkins::Tasks::Publisher
 
   def perform(build, launcher, listener)
     builder  = HipChat::Publisher::MessageBuilderFactory.create(build.native)
-    messages = builder.build_messages
+    messages = builder.build_messages(exclude_successes: @exclude_successes)
 
     api = HipChat::Publisher::API.new(token, room, 'Jenkins')
     messages.each do |message|
