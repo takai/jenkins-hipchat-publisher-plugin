@@ -7,6 +7,7 @@ class HipchatPublisher < Jenkins::Tasks::Publisher
 
   attr_accessor :token
   attr_accessor :room
+  attr_accessor :exclude_successes
 
   def initialize(opts)
     @token = opts['token']
