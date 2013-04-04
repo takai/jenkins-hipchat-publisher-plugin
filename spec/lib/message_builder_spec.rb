@@ -3,11 +3,24 @@ require 'spec_helper'
 module HipChat
   module Publisher
     shared_context "jenkins build result" do
-      let(:build) do
-        double('build').tap do |b|
+      let(:previous_result) { Result::SUCCESS }
+      let(:previous_build) do
+        double('prev_build').tap do |b|
           b.stub(:full_display_name => 'project #1')
           b.stub(:duration_string   => '1 ms')
           b.stub(:url               => 'job/project/1/')
+          b.stub(:result            => previous_result)
+
+          b.stub_chain(:change_set, :items => [])
+        end
+      end
+
+      let(:build) do
+        double('build').tap do |b|
+          b.stub(:full_display_name => 'project #2')
+          b.stub(:duration_string   => '1 ms')
+          b.stub(:url               => 'job/project/2/')
+          b.stub(:previous_build    => previous_build)
 
           b.stub_chain(:change_set, :items => [])
         end
@@ -22,8 +35,8 @@ module HipChat
       subject { messages[0] }
     end
 
-    MESSAGE_TEMPLATE = 'project #1 - %s after 1 ms'\
-                       ' (<a href="http://example.com/job/project/1/">Open</a>)'
+    MESSAGE_TEMPLATE = 'project #2 - %s after 1 ms'\
+                       ' (<a href="http://example.com/job/project/2/">Open</a>)'
 
     describe SuccessMessageBuilder do
       include_context "jenkins build result"
@@ -37,7 +50,7 @@ module HipChat
 
         context 'Jenkins URL is not set' do
           before { Java::jenkins::model::Jenkins.stub_chain(:instance, :root_url => nil) }
-          its(:body) { should eq 'project #1 - Success after 1 ms' }
+          its(:body) { should eq 'project #2 - Success after 1 ms' }
           its(:options) { should eq :color => 'green', :notify => false }
         end
 
@@ -53,6 +66,12 @@ module HipChat
           subject { messages }
 
           it { should be_empty }
+
+          context "when previous build was failed" do
+            let(:previous_result) { Result::FAILURE }
+
+            it { should_not be_empty }
+          end
         end
       end
     end

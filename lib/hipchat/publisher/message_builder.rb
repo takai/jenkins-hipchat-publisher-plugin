@@ -35,7 +35,14 @@ module HipChat
 
       def build_messages(options={})
         if options[:exclude_successes]
-          []
+          prev_build = build.previous_build rescue nil
+
+          if prev_build && prev_build.result != Result::SUCCESS
+            @status = 'Success (recovered)'
+            super
+          else
+            []
+          end
         else
           super
         end
