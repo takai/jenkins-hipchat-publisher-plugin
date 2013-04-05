@@ -22,8 +22,9 @@ module HipChat
         post.add_parameter 'from',    from
         post.add_parameter 'message', message
 
-        post.add_parameter 'color',   params[:color]       if params[:color]
-        post.add_parameter 'notify',  params[:notify] ? '1' : '0'
+        post.add_parameter 'color',          params[:color]          if params[:color]
+        post.add_parameter 'message_format', params[:message_format] if params[:message_format]
+        post.add_parameter 'notify',         params[:notify] ? '1' : '0'
 
         post.params.content_charset = 'UTF-8'
 
