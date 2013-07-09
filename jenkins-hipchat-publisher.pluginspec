@@ -13,5 +13,5 @@ Jenkins::Plugin::Specification.new do |plugin|
 
   plugin.uses_repository :github => "takai/jenkins-hipchat-publisher-plugin"
 
-  plugin.depends_on 'ruby-runtime', '0.11'
+  plugin.depends_on 'ruby-runtime', '0.12'
 end
